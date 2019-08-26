@@ -4,16 +4,6 @@ import PlayNumber from "./PlayNumber";
 import utils from './math.js';
 import StarsDisplay from "./StarsDisplay";
 
-
-// Color Theme
-const colors = {
-    available: 'lightgray',
-    used: 'lightgreen',
-    wrong: 'lightcoral',
-    candidate: 'deepskyblue',
-  };
-
-
 class App extends Component {
     state = {
         stars: utils.random(1,9),
