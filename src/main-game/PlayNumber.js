@@ -11,7 +11,7 @@ const colors = {
 const PlayNumber = props => (
     <button 
         className="number" 
-        onClick={() => console.log('Num', props.number)}
+        onClick={() => props.onClick(props.number, props.status)}
         style = {{ backgroundColor: colors[props.status]}}
     >
         {props.number}

@@ -7,8 +7,8 @@ import StarsDisplay from "./StarsDisplay";
 class App extends Component {
     state = {
         stars: utils.random(1,9),
-        availableNums: [1,2,3,4,5],
-        candidateNums: [2,3],
+        availableNums: utils.range(1,9),
+        candidateNums: [],
     };
     
     render() {
@@ -23,6 +23,27 @@ class App extends Component {
             }
             return 'available';
         }
+
+        const onNumberClick = (num, currentStatus) => {
+            //already clicked
+            if(currentStatus == 'used') {
+                return;
+            }
+
+            //candidate num
+            const newCandidateNums = this.state.candidateNums.concat(num);
+            if(utils.sum(newCandidateNums) != this.state.stars) {
+                this.setState(this.state.candidateNums, newCandidateNums);
+            } else {
+                const newAvailableNums = this.state.availableNums.filter(
+                    n => newCandidateNums.includes(n)
+                );
+                this.setState(this.state.stars, utils.randomSumIn(newAvailableNums, 9));
+                this.setState(this.state.availableNums, newAvailableNums);
+                this.setState(this.state.candidateNums([]));
+            }
+        }
+
         return(
             <div className="game">
                 <div className="help">
@@ -37,7 +58,9 @@ class App extends Component {
                                 <PlayNumber 
                                 key={number}
                                 status={numberStatus(number)} 
-                                number={number} />
+                                number={number} 
+                                onClick={onNumberClick}
+                                />
                             )}
                     </div>
                 </div>
