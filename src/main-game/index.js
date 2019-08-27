@@ -5,17 +5,39 @@ import utils from './math.js';
 import StarsDisplay from "./StarsDisplay";
 import PlayAgain from "./PlayAgain";
 import { reset } from 'ansi-colors';
+import { timer } from 'rxjs';
 
 class App extends Component {
     state = {
         stars: utils.random(1,9),
         availableNums: utils.range(1,9),
         candidateNums: [],
+        secondsLeft: 10,
     };
+
+    componentDidMount() {
+        if(this.state.secondsLeft >0) {
+            const timerId = setTimeout(()=> {
+                this.setState({secondsLeft: this.state.secondsLeft - 1});
+            }, 1000);
+            return () => clearTimeout(timerId);
+        }
+        
+    }
+
+    componentDidUpdate() {
+        if(this.state.secondsLeft >0) {
+            const timerId = setTimeout(()=> {
+                this.setState({secondsLeft: this.state.secondsLeft - 1});
+            }, 1000);
+            return () => clearTimeout(timerId);
+        }
+    }
     
     render() {
         const candidatesAreWrong = utils.sum(this.state.candidateNums) > this.state.stars;
         const gameIsDone = this.state.availableNums.length ===0;
+        
 
         const resetGame = () => {
             this.setState({
@@ -24,6 +46,7 @@ class App extends Component {
                 candidateNums :[],
             });
         }
+
 
         const numberStatus= (number) => {
             if(!this.state.availableNums.includes(number)) {
@@ -83,7 +106,7 @@ class App extends Component {
                             )}
                     </div>
                 </div>
-                <div className="timer">Time Remaining: 10</div>
+                <div className="timer">Time Remaining: {this.state.secondsLeft}</div>
             </div>
         );
     }
