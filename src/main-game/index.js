@@ -3,6 +3,8 @@ import './main-game.css';
 import PlayNumber from "./PlayNumber";
 import utils from './math.js';
 import StarsDisplay from "./StarsDisplay";
+import PlayAgain from "./PlayAgain";
+import { reset } from 'ansi-colors';
 
 class App extends Component {
     state = {
@@ -13,6 +15,15 @@ class App extends Component {
     
     render() {
         const candidatesAreWrong = utils.sum(this.state.candidateNums) > this.state.stars;
+        const gameIsDone = this.state.availableNums.length ===0;
+
+        const resetGame = () => {
+            this.setState({
+                stars: utils.random(1,9),
+                availableNums: utils.range(1,9),
+                candidateNums :[],
+            });
+        }
 
         const numberStatus= (number) => {
             if(!this.state.availableNums.includes(number)) {
@@ -26,21 +37,26 @@ class App extends Component {
 
         const onNumberClick = (num, currentStatus) => {
             //already clicked
-            if(currentStatus == 'used') {
+            if(currentStatus === 'used') {
                 return;
             }
 
             //candidate num
-            const newCandidateNums = this.state.candidateNums.concat(num);
-            if(utils.sum(newCandidateNums) != this.state.stars) {
-                this.setState(this.state.candidateNums, newCandidateNums);
+            const newCandidateNums = 
+                currentStatus === 'available' ? 
+                this.state.candidateNums.concat(num)
+                : this.state.candidateNums.filter(cn => cn !== num);
+            if(utils.sum(newCandidateNums) !== this.state.stars) {
+                this.setState({candidateNums: newCandidateNums});
             } else {
                 const newAvailableNums = this.state.availableNums.filter(
-                    n => newCandidateNums.includes(n)
+                    n => !newCandidateNums.includes(n)
                 );
-                this.setState(this.state.stars, utils.randomSumIn(newAvailableNums, 9));
-                this.setState(this.state.availableNums, newAvailableNums);
-                this.setState(this.state.candidateNums([]));
+                this.setState({
+                    stars: utils.randomSumIn(newAvailableNums, 9),
+                    availableNums: newAvailableNums,
+                    candidateNums: []
+                });
             }
         }
 
@@ -51,7 +67,10 @@ class App extends Component {
                 </div>
                 <div className="body">
                     <div className="left">
-                        <StarsDisplay count={this.state.stars} />
+                        {gameIsDone ?
+                            (<PlayAgain onClick={resetGame}/>)
+                            : (<StarsDisplay count={this.state.stars} />
+                        )}
                     </div>
                     <div className="right">
                         {utils.range(1,9).map(number => 
